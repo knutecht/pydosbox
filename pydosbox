@@ -33,61 +33,61 @@ class Base:
 		self.gamelist = []
 		self.dosboxpath = "/usr/bin/dosbox"
 		#Create main window
-		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
+		self.window = Gtk.Window(Gtk.WindowType.TOPLEVEL)
 		
 		# Create executable chooser
-		self.exec_hbox = gtk.HBox()
-		self.browse = gtk.Button("Browse")
-		self.executable = gtk.Entry(0)
-		self.execlabel = gtk.Label("Executable")
-		self.exec_hbox.pack_start(self.execlabel, gtk.FALSE, gtk.FALSE)
-		self.exec_hbox.pack_start(self.executable, gtk.TRUE, gtk.TRUE)
-		self.exec_hbox.pack_start(self.browse, gtk.FALSE, gtk.FALSE)
+		self.exec_hbox = Gtk.HBox()
+		self.browse = Gtk.Button("Browse")
+		self.executable = Gtk.Entry(0)
+		self.execlabel = Gtk.Label(label="Executable")
+		self.exec_hbox.pack_start(self.execlabel, False, False)
+		self.exec_hbox.pack_start(self.executable, True, True)
+		self.exec_hbox.pack_start(self.browse, False, False)
 		
-		self.profbox = gtk.HBox()
-		self.store_b = gtk.Button ("Store")
-		self.delete_b = gtk.Button ("Delete")
-		self.profbox.pack_start(self.store_b)
-		self.profbox.pack_start(self.delete_b)
+		self.profbox = Gtk.HBox()
+		self.store_b = Gtk.Button ("Store")
+		self.delete_b = Gtk.Button ("Delete")
+		self.profbox.pack_start(self.store_b, True, True, 0)
+		self.profbox.pack_start(self.delete_b, True, True, 0)
 
 		# Browser creation
-		self.filesel = gtk.FileSelection ("Please provive with the Executable filename")
+		self.filesel = Gtk.FileSelection ("Please provive with the Executable filename")
 
 		# DOSBOX options
-		self.optbox = gtk.VBox()
-		self.fullscreen = gtk.CheckButton ("Full screen mode")
-		self.exitb = gtk.CheckButton ("Exit DOS mode after program fiishes")
-		self.execb = gtk.Button ("Execute Game")
-		self.name_label = gtk.Label ("Name of the game")
-		self.gname = gtk.Entry(0)
-		self.separator = gtk.HSeparator()
-		self.optbox.pack_start(self.name_label, gtk.FALSE, gtk.FALSE)
-		self.optbox.pack_start(self.gname, gtk.FALSE, gtk.FALSE)
-		self.optbox.pack_start(self.separator, gtk.FALSE, gtk.FALSE, 5)
-		self.optbox.pack_start(self.exec_hbox, gtk.FALSE, gtk.FALSE)
-		self.optbox.pack_start(self.fullscreen, gtk.FALSE, gtk.FALSE)
-		self.optbox.pack_start(self.exitb, gtk.FALSE, gtk.FALSE)
-		self.optbox.pack_start(self.execb, gtk.FALSE, gtk.FALSE)
-		self.optbox.pack_start(gtk.Label(" "), gtk.TRUE, gtk.TRUE)
-		self.optbox.pack_end(self.profbox, gtk.FALSE, gtk.FALSE)
+		self.optbox = Gtk.VBox()
+		self.fullscreen = Gtk.CheckButton ("Full screen mode")
+		self.exitb = Gtk.CheckButton ("Exit DOS mode after program fiishes")
+		self.execb = Gtk.Button ("Execute Game")
+		self.name_label = Gtk.Label(label="Name of the game")
+		self.gname = Gtk.Entry(0)
+		self.separator = Gtk.HSeparator()
+		self.optbox.pack_start(self.name_label, False, False)
+		self.optbox.pack_start(self.gname, False, False)
+		self.optbox.pack_start(self.separator, False, False, 5)
+		self.optbox.pack_start(self.exec_hbox, False, False)
+		self.optbox.pack_start(self.fullscreen, False, False)
+		self.optbox.pack_start(self.exitb, False, False)
+		self.optbox.pack_start(self.execb, False, False)
+		self.optbox.pack_start(Gtk.Label(" ", True, True, 0), True, True)
+		self.optbox.pack_end(self.profbox, False, False)
 		
 		# Games list
-		self.scr_window = gtk.ScrolledWindow()
-		self.scr_window.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-		self.model = gtk.ListStore(gobject.TYPE_STRING)
-		self.tree = gtk.TreeView(self.model)
+		self.scr_window = Gtk.ScrolledWindow()
+		self.scr_window.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+		self.model = Gtk.ListStore(GObject.TYPE_STRING)
+		self.tree = Gtk.TreeView(self.model)
 		self.selection = self.tree.get_selection()
-		cell = gtk.CellRendererText()
+		cell = Gtk.CellRendererText()
 		self.tree.show()
 		self.scr_window.add_with_viewport (self.tree)
 		self.scr_window.show()
-		column = gtk.TreeViewColumn("Game Presets", cell, text=0)
+		column = Gtk.TreeViewColumn("Game Presets", cell, text=0)
 		self.tree.append_column(column)
 		self.scr_window.set_size_request(200, 400)
 		
 
 		# Pack *all* remaining components
-		self.hpane = gtk.HPaned()
+		self.hpane = Gtk.HPaned()
 		self.hpane.add1(self.scr_window)
 		self.hpane.add2(self.optbox)
 		self.window.add(self.hpane)
@@ -127,15 +127,15 @@ class Base:
 	
 		self.restore_profiles()
 
-		gtk.main()
+		Gtk.main()
 
 		
 	def delete_event(self, widget, event, data=None):
-		return gtk.FALSE
+		return False
 		
 	def destroy(self, widget, data=None):
 		self.store_profiles()
-		gtk.main_quit()
+		Gtk.main_quit()
 
 	def exec_game(self, widget, data=None):
 		cmd=["dosbox"]
@@ -167,7 +167,7 @@ class Base:
 
 	def browse_ignore (self, widget, data=None):
 		self.filesel.hide()
-		return gtk.TRUE
+		return True
 	
 	def add_profile (self, widget, data=None):
 		self.add_to_list( self.gname.get_text(), self.executable.get_text(), self.fullscreen.get_active(), self.exitb.get_active())
