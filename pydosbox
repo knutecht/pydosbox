@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Author: Panayotis Katsaloulis
 # email:  http://www.panayotis.com
@@ -22,8 +22,9 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 # or check http://www.gnu.org
 
-
-import gtk,gobject,os
+import gi,os
+gi.require_version("Gtk","3.0")
+from gi.repository import Gtk
 
 class Base:
 	def __init__(self):
@@ -38,11 +39,11 @@ class Base:
 		# Create executable chooser
 		self.exec_hbox = Gtk.HBox()
 		self.browse = Gtk.Button("Browse")
-		self.executable = Gtk.Entry(0)
+		self.executable = Gtk.Entry()
 		self.execlabel = Gtk.Label(label="Executable")
-		self.exec_hbox.pack_start(self.execlabel, False, False)
-		self.exec_hbox.pack_start(self.executable, True, True)
-		self.exec_hbox.pack_start(self.browse, False, False)
+		self.exec_hbox.pack_start(self.execlabel, False, False, 0)
+		self.exec_hbox.pack_start(self.executable, True, True, 0)
+		self.exec_hbox.pack_start(self.browse, False, False, 0)
 		
 		self.profbox = Gtk.HBox()
 		self.store_b = Gtk.Button ("Store")
@@ -51,7 +52,7 @@ class Base:
 		self.profbox.pack_start(self.delete_b, True, True, 0)
 
 		# Browser creation
-		self.filesel = Gtk.FileSelection ("Please provive with the Executable filename")
+
 
 		# DOSBOX options
 		self.optbox = Gtk.VBox()
@@ -59,22 +60,22 @@ class Base:
 		self.exitb = Gtk.CheckButton ("Exit DOS mode after program fiishes")
 		self.execb = Gtk.Button ("Execute Game")
 		self.name_label = Gtk.Label(label="Name of the game")
-		self.gname = Gtk.Entry(0)
+		self.gname = Gtk.Entry()
 		self.separator = Gtk.HSeparator()
-		self.optbox.pack_start(self.name_label, False, False)
-		self.optbox.pack_start(self.gname, False, False)
+		self.optbox.pack_start(self.name_label, False, False, 0)
+		self.optbox.pack_start(self.gname, False, False, 0)
 		self.optbox.pack_start(self.separator, False, False, 5)
-		self.optbox.pack_start(self.exec_hbox, False, False)
-		self.optbox.pack_start(self.fullscreen, False, False)
-		self.optbox.pack_start(self.exitb, False, False)
-		self.optbox.pack_start(self.execb, False, False)
-		self.optbox.pack_start(Gtk.Label(" ", True, True, 0), True, True)
-		self.optbox.pack_end(self.profbox, False, False)
+		self.optbox.pack_start(self.exec_hbox, False, False, 0)
+		self.optbox.pack_start(self.fullscreen, False, False, 0)
+		self.optbox.pack_start(self.exitb, False, False, 0)
+		self.optbox.pack_start(self.execb, False, False, 0)
+		self.optbox.pack_start(Gtk.Label(" ", True, True, 0), True, True, 0)
+		self.optbox.pack_end(self.profbox, False, False, 0)
 		
 		# Games list
 		self.scr_window = Gtk.ScrolledWindow()
 		self.scr_window.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
-		self.model = Gtk.ListStore(GObject.TYPE_STRING)
+		self.model = Gtk.ListStore(str)
 		self.tree = Gtk.TreeView(self.model)
 		self.selection = self.tree.get_selection()
 		cell = Gtk.CellRendererText()
@@ -120,9 +121,6 @@ class Base:
 		self.delete_b.connect("clicked", self.delete_profile)
 		self.fullscreen.connect("toggled", self.full_toggle)
 		self.exitb.connect("toggled", self.dos_toggle)
-		self.filesel.ok_button.connect("clicked", self.browse_ok)
-		self.filesel.cancel_button.connect("clicked", self.browse_cancel, "cancel")
-		self.filesel.connect("delete_event", self.browse_ignore)
 		self.selection.connect("changed", self.profile_select)
 	
 		self.restore_profiles()
@@ -145,7 +143,7 @@ class Base:
 			cmd.append(self.executable.get_text())
 		if ( self.opt_exit != "" ):
 			cmd.append(self.opt_exit)
-		print "Execute", self.dosboxpath, "with arguments", cmd
+		print("Execute", self.dosboxpath, "with arguments", cmd)
 		self.pid=os.spawnv( os.P_NOWAIT, self.dosboxpath, cmd)
 	
 	def full_toggle(self, widget, data=None):
@@ -156,7 +154,21 @@ class Base:
 
 
 	def browse_filename(self, widget, data=None):
-		self.filesel.show()
+		file_browser = Gtk.FileChooserDialog(
+            "Please provive with the Executable filename",
+            self,
+            Gtk.FileChooserAction.OPEN,
+            (
+                Gtk.STOCK_CANCEL,
+                Gtk.ResponseType.CANCEL,
+                Gtk.STOCK_OPEN,
+                Gtk.ResponseType.OK,
+            ),
+        )
+		file_browser.ok_button.connect("clicked", self.browse_ok)
+		file_browser.cancel_button.connect("clicked", self.browse_cancel, "cancel")
+		file_browser.connect("delete_event", self.browse_ignore)
+		file_brower.show()
 
 	def browse_ok(self, widget, data=None):
 		self.executable.set_text(self.filesel.get_filename())
@@ -199,7 +211,7 @@ class Base:
 
 	def store_profiles (self):
 		filename = self.get_prefs_filename()
-		outfile = file(filename,'w')
+		outfile = open(filename,'w')
 		outfile.write("self.dosboxpath = \"")
 		outfile.write(self.dosboxpath)
 		outfile.write("\"\nself.profiles = [")
@@ -222,13 +234,13 @@ class Base:
 	def restore_profiles (self):
 		filename=self.get_prefs_filename()
 		try:
-			outfile = file(filename,'r')
-			execfile(filename)
+			outfile = open(filename,'r')
+			exec(filename)
 			outfile.close()
 			for dat in self.profiles:
 				self.add_to_list(dat[0], dat[1], dat[2], dat[3])
 		except IOError:
-			print "Filename",filename,"not found. Creating with default parameters."
+			print("Filename",filename,"not found. Creating with default parameters.")
 			self.add_to_list ('Default', '', False, False)
 			
 	
