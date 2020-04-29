@@ -1,10 +1,10 @@
 # pydosbox
 A frontend to the exellent DOSBox emulator.
 
-This file profives information for the pyDosBox frontend.
+This file provides information for the pyDosBox frontend.
 It is still in alpha stage, although usable.
 
-To use it you need python 2.3 and pygtk 2.0.
+To use it you need python 3 and pygtk 3.
 
 No installation is necessary. Just execute it and it will pop up!
 I haven't test it under windows, so probably it won't run, although 
@@ -21,6 +21,7 @@ For any comments you are welcomed to contact me.
 Frontend of DOSBox emulator, written in python and pygtk
 
 Copyright (C) 2003 Panayotis Katsaloulis 
+ Updated April 2020 to use Python3 and PyGtk+3 by Kyle Utecht
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
