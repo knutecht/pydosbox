@@ -235,7 +235,7 @@ class Base:
 		filename=self.get_prefs_filename()
 		try:
 			outfile = open(filename,'r')
-			exec(filename)
+			exec(open(filename).read())
 			outfile.close()
 			for dat in self.profiles:
 				self.add_to_list(dat[0], dat[1], dat[2], dat[3])
